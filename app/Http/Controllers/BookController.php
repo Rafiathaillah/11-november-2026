@@ -19,12 +19,13 @@ class BookController extends Controller
     }
 
     public function store(Request $request){
-        Book::create([
-            "title" => $request->title,
-            "writer" => $request->writer,
-            "published_year" => $request->published_year,
-            "cover_path" => $request->cover_path,
+        $data = $request->validate([
+            "title" => 'required|string|max:255',
+            "writer" => 'required|string|max:255',
+            "published_year" => 'required|integer|min:1|max:9999',
+            "cover_path" => 'nullable|image|max:2048',
         ]);
+        Book::create($data);
 
         return redirect("/");
     }
@@ -35,15 +36,15 @@ class BookController extends Controller
 
     public function update(Request $request, Book $book){
         $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'writer' => ['required', 'string', 'max:255'],
-            'published_year' => ['nullable', 'integer', 'min:0', 'max:9999'],
-            'cover_path' => ['nullable', 'image', 'max:2048'],
+            'title' => 'required|string|max:255',
+            'writer' => 'required|string|max:255',
+            'published_year' => 'nullable|integer|min:0|max:9999',
+            'cover_path' => 'nullable|image|max:2048',
         ]);
 
-        if ($request->hasFile('cover_path')) {
-            $validated['cover_path'] = $request->file('cover_path')->store('covers', 'public');
-        }
+        // if ($request->hasFile('cover_path')) {
+        //     $validated['cover_path'] = $request->file('cover_path')->store('covers', 'public');
+        // }
 
         $book->update($validated);
 
